@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { List, Modal } from 'antd';
+import { List, message, Modal, Popconfirm } from 'antd';
 import Pill from './Pill';
 import TaskForm from './TaskForm';
 import { AppContext } from '../context';
-import { getTaskList } from '../api-calls';
+import { getTaskList, deleteTask } from '../api-calls';
 import Avatar from './Avatar';
 import styled from 'styled-components';
 
@@ -16,6 +16,30 @@ const TaskList = () => {
     setShowModal(true);
     setEditItem(item);
   } 
+
+  
+  const onConfirm = (item) => {
+    const formData = new FormData();
+    formData.append('taskid',item.id);
+    deleteTask(formData)
+    .then((res)=>{
+      if(res === 'success'){
+        message.success('Task Deleted Successfully!');
+        setState(state =>({...state, action: 'delete'}));
+        getUpdatedTasks();
+
+      }else{
+        message.error('There was an error!');
+      }
+    })
+    .catch((err)=>{
+      message.error('There was an error');
+    })
+  }
+
+  const onCancel = () => {
+    console.log('clicked cancel')
+  }
 
   return(   
     <>
@@ -34,7 +58,15 @@ const TaskList = () => {
           </div>
           <ActionStyles>
             <Styld.Button onClick={()=>editClicked(item)} >Edit</Styld.Button>
+            <Popconfirm
+            title="Are you sure delete this task?"
+            onConfirm={()=>onConfirm(item)}
+            onCancel={onCancel}
+            okText="Yes"
+            cancelText="No"
+          >
             <Styld.Button>Delete</Styld.Button>
+            </Popconfirm>
           </ActionStyles>
           {item.assigned_to && state.userObj && state.userObj[Number(item.assigned_to)] && <Avatar user={state.userObj[Number(item.assigned_to)]} />}
           </Styld.Wrapper>          
