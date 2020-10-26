@@ -30,7 +30,10 @@ const TaskCard = ({item}) => {
       }else{
         message.error('There was an error!');
       }
-    });
+    })
+    .catch((err)=>{
+      message.error('There was an error');
+    })
   }
 
   const onCancel = () => {
